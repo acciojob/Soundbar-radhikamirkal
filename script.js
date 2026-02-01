@@ -1,26 +1,35 @@
-//your JS code here. If required.
-const sounds = ["applause", "boo", "gasp", "tada", "victory", "wrong"];
-let currentAudio = null;
+const buttons = document.querySelectorAll(".btn");
+const stopBtn = document.querySelector(".stop");
 
-// Play sound when button clicked
-document.querySelectorAll(".btn").forEach(button => {
-  button.addEventListener("click", () => {
-    const sound = button.getAttribute("data-sound");
+// Keep reference to all audio elements
+let audios = {};
 
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    }
+buttons.forEach((btn) => {
+  const sound = btn.innerText;
 
-    currentAudio = new Audio(`sounds/${sound}.mp3`);
-    currentAudio.play();
+  // Create audio element
+  const audio = document.createElement("audio");
+  audio.src = `sounds/${sound}.mp3`;
+  audio.setAttribute("data-sound", sound);
+
+  // Append audio to body so Cypress can detect it
+  document.body.appendChild(audio);
+
+  audios[sound] = audio;
+
+  btn.addEventListener("click", () => {
+    stopAll();
+    audio.play();
   });
 });
 
-// Stop button logic
-document.querySelector(".stop").addEventListener("click", () => {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-  }
-});
+// Stop all sounds
+function stopAll() {
+  Object.values(audios).forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
+
+// Stop button
+stopBtn.addEventListener("click", stopAll);
